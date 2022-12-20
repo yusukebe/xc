@@ -1,8 +1,8 @@
 {
   "name": "xcjs",
   "version": "0.0.1",
+  "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "module": "dist/index.js",
   "type": "module",
   "files": [
     "dist"
@@ -17,6 +17,11 @@
     "lint:fix": "eslint -c .eslintrc.cjs src/**.ts --fix",
     "prerelease": "yarn build",
     "release": "np"
+  },
+  "author": "Yusuke Wada <yusuke@kamawada.com> (https://github.com/yusukebe)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yusukebe/xc.git"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org",
