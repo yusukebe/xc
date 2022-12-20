@@ -1,6 +1,6 @@
 {
   "name": "xcjs",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "types": "dist/index.d.ts",
   "module": "dist/index.js",
   "type": "module",
@@ -17,6 +17,10 @@
     "lint:fix": "eslint -c .eslintrc.cjs src/**.ts --fix",
     "prerelease": "yarn build",
     "release": "np"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
   },
   "engines": {
     "node": ">=18"
