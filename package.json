@@ -1,0 +1,45 @@
+{
+  "name": "xcjs",
+  "version": "0.0.1",
+  "types": "dist/index.d.ts",
+  "module": "dist/index.js",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "test": "jest",
+    "esbuild": "esbuild --bundle --minify ./src/index.ts --outdir=./dist --format=esm --sourcemap",
+    "build": "rimraf dist && yarn esbuild && yarn tsc",
+    "tsc": "tsc --emitDeclarationOnly --declaration",
+    "lint": "eslint -c .eslintrc.cjs src/**.ts",
+    "lint:fix": "eslint -c .eslintrc.cjs src/**.ts --fix",
+    "prerelease": "yarn build",
+    "release": "np"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.2.4",
+    "@types/node": "^18.11.9",
+    "@typescript-eslint/eslint-plugin": "^5.44.0",
+    "@typescript-eslint/parser": "^5.44.0",
+    "esbuild": "^0.15.15",
+    "esbuild-jest": "^0.5.0",
+    "eslint": "^8.28.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-define-config": "^1.12.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-node": "^11.1.0",
+    "fetch-mock": "^9.11.0",
+    "jest": "^29.3.1",
+    "node-fetch": "2",
+    "np": "^7.6.2",
+    "prettier": "^2.8.0",
+    "rimraf": "^3.0.2",
+    "ts-jest": "^29.0.3",
+    "typescript": "^4.9.3"
+  }
+}
