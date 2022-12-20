@@ -1,6 +1,6 @@
 {
   "name": "xcjs",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "types": "dist/index.d.ts",
   "module": "dist/index.js",
   "type": "module",
