@@ -5,6 +5,7 @@ interface XcResponse extends Promise<Response> {
 }
 
 type Handler = ((c: Context) => Request | void) | Record<string, unknown>
+type Hook = (res: Response) => unknown | undefined
 
 class Context {
   private url: URL
@@ -18,7 +19,7 @@ class Context {
     this.method = method ?? 'GET'
   }
 
-  request(body?: object) {
+  request(body?: object | string) {
     const init: RequestInit = {
       method: this.method,
     }
@@ -80,6 +81,7 @@ function defineDynamicClass(): {
 
 export class Xc extends defineDynamicClass() {
   private url?: URL
+  private _hook?: Hook
 
   constructor(urlString?: string) {
     super()
@@ -103,14 +105,50 @@ export class Xc extends defineDynamicClass() {
     let request: Request
 
     if (typeof handler === 'function') {
-      const r = handler(c) || undefined
-      request = r instanceof Request ? r : c.request(r)
+      const r = handler(c)
+      request = r instanceof Request ? r : c.request(handler)
     } else {
-      request = c.request(handler)
+      if (typeof handler === 'object') {
+        c.json(handler)
+        request = c.request()
+      } else {
+        request = c.request(handler)
+      }
     }
 
     const fn = async (request: Request): Promise<Response> => {
-      return await fetch(request)
+      const response = await fetch(request)
+
+      if (this._hook) {
+        const hookResponse = this._hook(response)
+
+        if (hookResponse instanceof Response) {
+          return hookResponse
+        }
+
+        const init = {
+          status: response.status,
+          statusText: response.statusText,
+          headers: {
+            ...response.headers,
+          },
+        }
+
+        if (typeof hookResponse === 'object') {
+          const newResponse = new Response(JSON.stringify(hookResponse), init)
+          newResponse.headers.set('Content-Type', 'application/json')
+          return newResponse
+        } else if (typeof hookResponse === 'string') {
+          const newResponse = new Response(hookResponse, init)
+          newResponse.headers.set('Content-Type', 'text/plain')
+          return newResponse
+        }
+      }
+
+      if (response.status >= 300) {
+        throw new Error(await response.text())
+      }
+      return response
     }
 
     const result = fn(request) as XcResponse
@@ -118,13 +156,14 @@ export class Xc extends defineDynamicClass() {
     for (const type of ['json', 'text'] as const) {
       result[type] = async () => {
         const response = await result
-        if (response.status >= 300) {
-          throw new Error(await response.text())
-        }
         return response[type]()
       }
     }
-
     return result
+  }
+
+  hook(hook: Hook): Xc {
+    this._hook = hook
+    return this
   }
 }
